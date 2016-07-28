@@ -7,6 +7,7 @@ import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfPage;
+import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 
@@ -17,13 +18,27 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Div;
 import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.property.TextAlignment;
+import com.sun.pdfview.PDFFile;
+import com.sun.pdfview.PDFPage;
+import com.sun.pdfview.PDFRenderer;
+import org.codemonkey.simplejavamail.Mailer;
+import org.codemonkey.simplejavamail.TransportStrategy;
+import org.codemonkey.simplejavamail.email.Email;
 
+
+import javax.activation.FileDataSource;
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.print.*;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.standard.Sides;
 import javax.print.event.PrintJobEvent;
 import javax.print.event.PrintJobListener;
+import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
@@ -31,7 +46,12 @@ import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Properties;
 
 /**
  * Created by Windows on 2016-07-26.
@@ -41,23 +61,39 @@ public class ExportManager implements Printable {
     File filePath = new File("data");
     PageSize letter = new PageSize(new Rectangle(612, 792));
 
+
     @Override
     public int print(Graphics g, PageFormat pf, int pageIndex) throws PrinterException {
         if (pageIndex > 0) { /* We have only one page, and 'page' is zero-based */
             return NO_SUCH_PAGE;
         }
 
+
+        Graphics2D g2d = (Graphics2D)g;
+
+        try {
+            RandomAccessFile raf = new RandomAccessFile(filePath + ".pdf", "r");
+            FileChannel channel = raf.getChannel();
+            ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+            PDFFile pdffile = new PDFFile(buf);
+
+            PDFPage page = pdffile.getPage(0);
+
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            PDFRenderer renderer = new PDFRenderer(page, g2d, new java.awt.Rectangle(0, 0, 612, 792), null, Color.RED);
+            page.waitForFinish();
+            renderer.run();
+            channel.close();
+            raf.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
         /* User (0,0) is typically outside the imageable area, so we must
          * translate by the X and Y values in the PageFormat to avoid clipping
          */
-        Graphics2D g2d = (Graphics2D)g;
-        g2d.translate(pf.getImageableX(), pf.getImageableY());
 
-        /* Now we perform our rendering */
-
-        g.drawString("Hello world!", 100, 100);
-
-        /* tell the caller that this page is part of the printed document */
         return PAGE_EXISTS;
     }
 
@@ -74,7 +110,6 @@ public class ExportManager implements Printable {
         Document doc = new Document(pdf, letter);
         PdfPage page = pdf.addNewPage();
         PdfCanvas pdfCanvas = new PdfCanvas(page);
-
         makeHeader(pdf, pdfCanvas);
         makeBody(pdf, pdfCanvas, textEditor);
         makeFooter(pdf, pdfCanvas);
@@ -125,80 +160,63 @@ public class ExportManager implements Printable {
         canvas.add(d);
     }
 
-    public void newPrinting(){
-        FileInputStream psStream = null;
-        try {
-            psStream = new FileInputStream("data/happyNess.pdf");
-        } catch (FileNotFoundException ffne) {
-            ffne.printStackTrace();
+    public void newPrinting() throws Exception{
+        DocFlavor flavor = DocFlavor.SERVICE_FORMATTED.PAGEABLE;
+        PrintRequestAttributeSet patts = new HashPrintRequestAttributeSet();
+        patts.add(Sides.DUPLEX);
+        PrintService[] ps = PrintServiceLookup.lookupPrintServices(flavor, patts);
+        if (ps.length == 0) {
+            throw new IllegalStateException("No Printer found");
         }
-        if (psStream == null) {
-            return;
-        }
-        DocFlavor psInFormat = DocFlavor.INPUT_STREAM.AUTOSENSE;
-        Doc myDoc = new SimpleDoc(psStream, psInFormat, null);
-        PrintService[] services = PrintServiceLookup.lookupPrintServices(psInFormat, null);
+        System.out.println("Available printers: " + Arrays.asList(ps));
 
-        // this step is necessary because I have several printers configured
-
-        PrintService myPrinter = null;
-        for (int i = 0; i < services.length; i++){
-            String svcName = services[i].toString();
-            System.out.println("service found: "+ svcName);
-            if (svcName.contains("HP")){
-                myPrinter = services[i];
-                System.out.println("my printer found: "+svcName);
+        PrintService myService = null;
+        for (PrintService printService : ps) {
+            if (printService.getName().contains("HP")) {
+                myService = printService;
                 break;
             }
         }
 
-        if (myPrinter != null) {
-            DocPrintJob job = myPrinter.createPrintJob();
-            try {
-                job.print(myDoc, new HashPrintRequestAttributeSet());
-                job.addPrintJobListener(new PrintJobListener() {
-                    @Override
-                    public void printDataTransferCompleted(PrintJobEvent pje) {
-                        System.out.println("hello");
-                    }
-
-                    @Override
-                    public void printJobCompleted(PrintJobEvent pje) {
-                        System.out.println("2");
-                    }
-
-                    @Override
-                    public void printJobFailed(PrintJobEvent pje) {
-                        System.out.println("3");
-
-                    }
-
-                    @Override
-                    public void printJobCanceled(PrintJobEvent pje) {
-                        System.out.println("d");
-
-                    }
-
-                    @Override
-                    public void printJobNoMoreEvents(PrintJobEvent pje) {
-                        System.out.println("s");
-
-                    }
-
-                    @Override
-                    public void printJobRequiresAttention(PrintJobEvent pje) {
-                        System.out.println("f");
-
-                    }
-                });
-
-            } catch (Exception pe) {
-                pe.printStackTrace();
-            }
-        } else {
-            System.out.println("no printer services found");
+        if (myService == null) {
+            throw new IllegalStateException("Printer not found");
         }
+
+        FileInputStream fis = new FileInputStream("data/happyNess.pdf");
+        Doc pdfDoc = new SimpleDoc(fis, DocFlavor.INPUT_STREAM.AUTOSENSE, null);
+        DocPrintJob printJob = myService.createPrintJob();
+        printJob.print(pdfDoc, new HashPrintRequestAttributeSet());
+        fis.close();
     }
+
+
+    public boolean sendEmail(){
+
+        Email email = new Email();
+
+        email.addRecipient(doctor.toString(), doctor.getEmail(), Message.RecipientType.TO);
+        email.setFromAddress("Uptown Villiage Optometry", "mountdougtalks@gmail.com");
+        email.setSubject("Refferal for ");
+        email.setText("We should meet up! ;)");
+
+        try {
+            RandomAccessFile raf = new RandomAccessFile(filePath + ".pdf", "r");
+            byte [] pdfData = new byte[(int)raf.length()];
+            raf.read(pdfData);
+            email.addAttachment("invitation", new FileDataSource(filePath + ".pdf"));
+
+
+            //new Mailer("smtp.gmail.com", 25, "javamailno", "thisisasilly", TransportStrategy.SMTP_TLS).sendMail(email);
+            new Mailer("smtp.gmail.com", 587, "mountdougtalks", "mdtalks123", TransportStrategy.SMTP_TLS).sendMail(email);
+            //new Mailer("smtp.gmail.com", 465, "javamailno@gmail.com", "thisisasilly", TransportStrategy.SMTP_SSL).sendMail(email);
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(null, e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+
 
 
 

@@ -14,10 +14,14 @@ public class Main {
     public static Color mainBlue = new Color(66, 113, 255);
     public static Person [] people;
     public static void main(String [] args){
-//        loadDoctors();
-//        op = new OptometryPanel();
-//        op.showPane();
-        new ExportManager().newPrinting();
+        loadDoctors();
+        op = new OptometryPanel();
+        op.showPane();
+//        try {
+//            new ExportManager().newPrinting();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
     public static String [] readFile(String name) throws IOException {

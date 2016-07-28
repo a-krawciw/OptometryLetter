@@ -238,6 +238,12 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
                 setStage(MENU);
             } else if(e.getSource().equals(print)){
                 editor.startPrint();
+            } else if(e.getSource().equals(email)){
+                editor.e.setDoctor((Person)people.getSelectedItem());
+                if(editor.e.sendEmail()){
+                    JOptionPane.showMessageDialog(OptometryPanel.this, "Email sent");
+                }
+
             }
         }
     }

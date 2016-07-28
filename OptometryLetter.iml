@@ -11,5 +11,8 @@
     <orderEntry type="library" name="iText7-7.0" level="project" />
     <orderEntry type="library" name="commons-logging-1.2" level="project" />
     <orderEntry type="library" name="MiGLayout" level="project" />
+    <orderEntry type="library" name="pdf-renderer" level="project" />
+    <orderEntry type="library" name="javax.mail" level="project" />
+    <orderEntry type="library" name="simple-java-mail-3.1.1" level="project" />
   </component>
 </module>

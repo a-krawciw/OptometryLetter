@@ -35,6 +35,10 @@ public class TextEditor extends JTextArea {
         setBorder(BorderFactory.createLineBorder(Main.mainBlue, 3));
     }
 
+    public TextEditor (){
+        this("");
+    }
+
     private String arrayAsOne(String [] lines){
         String expanded = "";
         doc = Main.getDoctor(lines[0]);

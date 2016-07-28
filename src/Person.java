@@ -10,13 +10,36 @@ public class Person implements Serializable{
     private String fName = "";
     private String lName = "";
     private String address = "";
+
+    public String getfName() {
+        return fName;
+    }
+
+    public String getlName() {
+        return lName;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getFax() {
+        return fax;
+    }
+
     private String email = "";
+    private String fax = "";
 
     public Person(String [] info){
         fName = info[0];
         lName = info[1];
         address = info[2];
         email = info[3];
+        fax = info[4];
     }
 
     public Person(){}
@@ -54,6 +77,10 @@ public class Person implements Serializable{
 
     public void setLastName(String lName) {
         this.lName = lName;
+    }
+
+    public void setFax(String fax) {
+        this.fax = fax;
     }
 
     public boolean equals(Object o){
