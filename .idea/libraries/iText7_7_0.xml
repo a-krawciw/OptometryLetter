@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="iText7-7.0">
+    <CLASSES>
+      <root url="file://$USER_HOME$/Downloads/iText7-7.0.0/iText7-7.0.0" />
+      <root url="jar://$USER_HOME$/Downloads/slf4j-1.7.21/slf4j-1.7.21/slf4j-jcl-1.7.21.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/slf4j-1.7.21/slf4j-1.7.21/slf4j-api-1.7.21.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/slf4j-1.7.21/slf4j-1.7.21/slf4j-ext-1.7.21.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$USER_HOME$/Downloads/iText7-7.0.0/iText7-7.0.0" />
+    </SOURCES>
+    <jarDirectory url="file://$USER_HOME$/Downloads/iText7-7.0.0/iText7-7.0.0" recursive="false" />
+    <jarDirectory url="file://$USER_HOME$/Downloads/iText7-7.0.0/iText7-7.0.0" recursive="false" type="SOURCES" />
+  </library>
+</component>
