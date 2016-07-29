@@ -7,9 +7,9 @@ import java.io.Serializable;
  * Created by Windows on 2016-07-25.
  */
 public class Person implements Serializable{
-    private String fName = "";
-    private String lName = "";
-    private String address = "";
+    protected String fName = "";
+    protected String lName = "";
+    protected String address = "";
 
     public String getfName() {
         return fName;
@@ -44,10 +44,6 @@ public class Person implements Serializable{
 
     public Person(){}
 
-    @Override
-    public String toString() {
-        return "Dr. " + lName;
-    }
 
     public void serialize(){
         try

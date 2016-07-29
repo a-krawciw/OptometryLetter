@@ -60,7 +60,7 @@ import java.util.Properties;
  * Created by Windows on 2016-07-26.
  */
 public class ExportManager implements Printable {
-    Person doctor;
+    Doctor doctor;
     String filePath = "";
     PageSize letter = new PageSize(new Rectangle(612, 792));
 
@@ -98,7 +98,7 @@ public class ExportManager implements Printable {
         return PAGE_EXISTS;
     }
 
-    public void setDoctor(Person p) {
+    public void setDoctor(Doctor p) {
         doctor = p;
     }
 
@@ -169,7 +169,7 @@ public class ExportManager implements Printable {
         email.addRecipient(doctor.toString(), doctor.getEmail(), Message.RecipientType.TO);
         email.setFromAddress("Uptown Villiage Optometry", "mountdougtalks@gmail.com");
         email.setSubject("Refferal for ");
-        email.setText("Please see attached referral letter.\nMary Jean Krawciw/nUptown Villiage Optometry");
+        email.setText("Please see attached referral letter.\nMary Jean Krawciw\nUptown Villiage Optometry");
 
         try {
             FileDataSource fd = new FileDataSource(filePath + ".pdf");

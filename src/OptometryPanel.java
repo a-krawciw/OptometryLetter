@@ -24,7 +24,7 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
     public Dimension windowSize ;
 
     JFileChooser browse = new JFileChooser("data");
-    ExportManager e = new ExportManager();
+    ExportManager e;
 
     private JPanel menuScreen;
     private OpButton newFile;
@@ -32,6 +32,7 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
 
 
     private OpButton docAdd;
+    private OpButton patientAdd;
 
     private JPanel editorScreen;
     private TextEditor editor;
@@ -43,7 +44,7 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
     private JLabel currentFile;
 
 
-    private JComboBox<Person> people;
+    private JComboBox<Doctor> people;
     private JPanel confirmScreen;
 
 
@@ -105,6 +106,7 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
 
         editor = new TextEditor("");
         docAdd = new OpButton("Add a new Doctor", op);
+        patientAdd = new OpButton("Set Patient Info", op);
         save = new OpButton("Save", op);
         savePdf = new OpButton("Export", op);
         email = new OpButton("Email Letter", op);
@@ -119,7 +121,8 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
 
         editorScreen.add(back);
         editorScreen.add(editor, "w 80%, h 90%, wrap");
-        editorScreen.add(docAdd, "cell 1 1, growx, gapbottom 40px, gaptop 50px");
+        editorScreen.add(patientAdd, "cell 1 1, growx, gapbottom 15px");
+        editorScreen.add(docAdd, "cell 1 1, growx, gapbottom 40px");
         editorScreen.add(save, "cell 1 1, growx, gapbottom 15px");
         editorScreen.add(savePdf, "cell 1 1, growx, gapbottom 15px");
         editorScreen.add(email, "cell 1 1, growx, gapbottom 15px");
@@ -169,9 +172,6 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
         }
 
         people = new JComboBox<>(Main.people);
-        if(editor.doc != null) {
-            people.setSelectedItem(editor.doc);
-        }
         people.addActionListener(op);
         editorScreen.add(people, "cell 1 0, growx");
         System.out.println("Hi");
@@ -196,8 +196,8 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
                 } catch (IOException i) {
                     i.printStackTrace();
                 }
-                setStage(EDITOR);
                 e = new ExportManager();
+                setStage(EDITOR);
                 editor.setText(text);
             } else if(event.getSource().equals(editFile)){
                 e = new ExportManager();
@@ -215,13 +215,14 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
                     JOptionPane.showMessageDialog(OptometryPanel.this, "File could not be opened");
                 }
 
+                people.setSelectedItem(Main.getDoctor(text[0]));
                 setStage(EDITOR);
                 editor.setText(text);
             } else if(event.getSource().equals(docAdd)){
                 new DoctorPanel();
             } else if(event.getSource().equals(people)){
-                e.setDoctor((Person)people.getSelectedItem());
-                editor.setDoctor((Person)people.getSelectedItem());
+                e.setDoctor((Doctor)people.getSelectedItem());
+                editor.setDoctor((Doctor)people.getSelectedItem());
             } else if(event.getSource().equals(save)){
                 int returnVal = browse.showSaveDialog(OptometryPanel.this);
 
@@ -258,6 +259,9 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
                 if(e.sendEmail()){
                     JOptionPane.showMessageDialog(OptometryPanel.this, "Email sent");
                 }
+            } else if (event.getSource().equals(patientAdd)){
+                Patient p = new PatientPanel(OptometryPanel.this).getPatientInormation();
+                System.out.println(p);
             }
         }
     }

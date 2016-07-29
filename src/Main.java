@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class Main {
     static OptometryPanel op;
     public static Color mainBlue = new Color(66, 113, 255);
-    public static Person [] people;
+    public static Doctor [] people;
     public static void main(String [] args){
         setupFolders();
         loadDoctors();
@@ -74,12 +74,12 @@ public class Main {
         try {
             File docFolder = new File("data/doctors");
             String [] names = docFolder.list();
-            people = new Person[names.length];
+            people = new Doctor[names.length];
 
             for (int i = 0; i < names.length; i++){
                 FileInputStream fileIn = new FileInputStream("data/doctors/" + names[i]);
                 ObjectInputStream in = new ObjectInputStream(fileIn);
-                people[i] = (Person) in.readObject();
+                people[i] = (Doctor) in.readObject();
                 in.close();
                 fileIn.close();
             }
@@ -89,7 +89,7 @@ public class Main {
         }
     }
 
-    public static Person getDoctor(String lName){
+    public static Doctor getDoctor(String lName){
         for (int i = 0; i < people.length; i++) {
             if(people[i].toString().equals(lName)) return people[i];
         }
