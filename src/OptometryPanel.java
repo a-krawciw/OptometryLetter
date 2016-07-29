@@ -2,6 +2,7 @@
 import net.miginfocom.swing.MigLayout;
 
 import javax.imageio.ImageIO;
+import javax.imageio.stream.FileImageInputStream;
 import javax.swing.*;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
@@ -23,6 +24,7 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
     public Dimension windowSize ;
 
     JFileChooser browse = new JFileChooser("data");
+    ExportManager e = new ExportManager();
 
     private JPanel menuScreen;
     private OpButton newFile;
@@ -38,6 +40,7 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
     private OpButton email;
     private OpButton print;
     private OpButton back;
+    private JLabel currentFile;
 
 
     private JComboBox<Person> people;
@@ -59,10 +62,11 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
         //createMenu();
         //createEditor();
         try {
-            setIconImage(ImageIO.read(new File("data/images/glasses.png")));
+            setIconImage(ImageIO.read(this.getClass().getResourceAsStream("./images/glasses.png")));
         } catch (IOException e) {
             e.printStackTrace();
         }
+
 
     }
 
@@ -74,7 +78,7 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
 
         Image image = null;
         try {
-             image = ImageIO.read(new File("data/images/menu.png"));
+             image = ImageIO.read(this.getClass().getResourceAsStream("./images/menu.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -107,10 +111,11 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
         print = new OpButton("Print", op);
         back = new OpButton("hello", op);
         try {
-            back.setImage(ImageIO.read(new File("data/images/arrow.png")));
+            back.setImage(ImageIO.read(this.getClass().getResourceAsStream("./images/arrow.png")));
         } catch (IOException e) {
             e.printStackTrace();
         }
+        currentFile = new JLabel("Currently editing " + e.filePath);
 
         editorScreen.add(back);
         editorScreen.add(editor, "w 80%, h 90%, wrap");
@@ -119,6 +124,9 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
         editorScreen.add(savePdf, "cell 1 1, growx, gapbottom 15px");
         editorScreen.add(email, "cell 1 1, growx, gapbottom 15px");
         editorScreen.add(print, "cell 1 1, growx");
+        editorScreen.add(currentFile, "cell 0 0, flowx");
+
+
         createDoctorList();
     }
 
@@ -179,17 +187,20 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
     private class OptometryListener implements ActionListener{
 
         @Override
-        public void actionPerformed(ActionEvent e) {
-            if(e.getSource().equals(newFile)){
+        public void actionPerformed(ActionEvent event) {
+
+            if(event.getSource().equals(newFile)){
                 String [] text = null;
                 try {
-                    text = Main.readFile("data/defaultTemplate.txt");
+                    text = Main.readFile(OptometryPanel.this.getClass().getResourceAsStream("./defaultTemplate.txt"));
                 } catch (IOException i) {
                     i.printStackTrace();
                 }
                 setStage(EDITOR);
+                e = new ExportManager();
                 editor.setText(text);
-            } else if(e.getSource().equals(editFile)){
+            } else if(event.getSource().equals(editFile)){
+                e = new ExportManager();
                 String [] text = null;
                 int returnVal = browse.showOpenDialog(OptometryPanel.this);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -199,51 +210,54 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
+                    e.setFilePath(file.getPath());
                 } else {
                     JOptionPane.showMessageDialog(OptometryPanel.this, "File could not be opened");
                 }
 
                 setStage(EDITOR);
                 editor.setText(text);
-            } else if(e.getSource().equals(docAdd)){
+            } else if(event.getSource().equals(docAdd)){
                 new DoctorPanel();
-            } else if(e.getSource().equals(people)){
+            } else if(event.getSource().equals(people)){
+                e.setDoctor((Person)people.getSelectedItem());
                 editor.setDoctor((Person)people.getSelectedItem());
-            } else if(e.getSource().equals(save)){
+            } else if(event.getSource().equals(save)){
                 int returnVal = browse.showSaveDialog(OptometryPanel.this);
 
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File file = browse.getSelectedFile();
                     editor.saveContents(file.getPath().replace(".txt", "")+".txt");
-                    try {
-                        editor.exportPdf(file.getPath());
-                    } catch (Exception e1) {
-                        JOptionPane.showMessageDialog(OptometryPanel.this, "The pdf is open in another program. \nYou must close that program in order to continue.");
-                    }
+                    e.setFilePath(file.getPath());
+                    currentFile.setText("Currently editing" + file.getName());
                 }
-            } else if(e.getSource().equals(savePdf)){
-                if(editor.filePath == ""){
+
+
+            } else if(event.getSource().equals(savePdf)){
+                if(e.filePath == ""){
                     JOptionPane.showMessageDialog(OptometryPanel.this, "PDF could not be exported.\nYou must save the document first");
                     return;
                 }
 
                 try {
-                    editor.exportPdf();
-                    JOptionPane.showMessageDialog(OptometryPanel.this, editor.filePath + ".pdf exported successfully");
+                    e.savePDF(editor);
+                    JOptionPane.showMessageDialog(OptometryPanel.this, e.filePath + ".pdf exported successfully");
                 } catch (Exception e1) {
                     JOptionPane.showMessageDialog(OptometryPanel.this, "The pdf is open in another program. \nYou must close that program in order to continue.");
                 }
-            } else if(e.getSource().equals(back)){
+            } else if(event.getSource().equals(back)){
                 editor.saveContents(editor.filePath);
                 setStage(MENU);
-            } else if(e.getSource().equals(print)){
-                editor.startPrint();
-            } else if(e.getSource().equals(email)){
-                editor.e.setDoctor((Person)people.getSelectedItem());
-                if(editor.e.sendEmail()){
+            } else if(event.getSource().equals(print)){
+                e.startPrint();
+            } else if(event.getSource().equals(email)){
+                if(e.doctor == null){
+                    JOptionPane.showMessageDialog(OptometryPanel.this, "You must choose a doctor first");
+                    return;
+                }
+                if(e.sendEmail()){
                     JOptionPane.showMessageDialog(OptometryPanel.this, "Email sent");
                 }
-
             }
         }
     }

@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="apidocs">
+    <CLASSES>
+      <root url="file://$USER_HOME$/Downloads/fax4j-0.41.9.jar" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="file://$USER_HOME$/Downloads/fax4j-0.43.2-full/fax4j-0.43.2/site/apidocs" />
+      <root url="file://$USER_HOME$/Downloads/fax4j-0.43.2-full/fax4j-0.43.2/site/testapidocs" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="file://$USER_HOME$/Downloads/fax4j-0.43.2-full/fax4j-0.43.2/src/main/java" />
+      <root url="file://$USER_HOME$/Downloads/fax4j-0.43.2-full/fax4j-0.43.2/src/test/java" />
+    </SOURCES>
+    <jarDirectory url="file://$USER_HOME$/Downloads/fax4j-0.41.9.jar" recursive="false" />
+  </library>
+</component>

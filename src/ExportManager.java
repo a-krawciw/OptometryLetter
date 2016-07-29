@@ -24,6 +24,9 @@ import com.sun.pdfview.PDFRenderer;
 import org.codemonkey.simplejavamail.Mailer;
 import org.codemonkey.simplejavamail.TransportStrategy;
 import org.codemonkey.simplejavamail.email.Email;
+import org.fax4j.FaxClient;
+import org.fax4j.FaxClientFactory;
+import org.fax4j.FaxJob;
 
 
 import javax.activation.FileDataSource;
@@ -58,7 +61,7 @@ import java.util.Properties;
  */
 public class ExportManager implements Printable {
     Person doctor;
-    File filePath = new File("data");
+    String filePath = "";
     PageSize letter = new PageSize(new Rectangle(612, 792));
 
 
@@ -72,6 +75,7 @@ public class ExportManager implements Printable {
         Graphics2D g2d = (Graphics2D)g;
 
         try {
+            System.out.println(filePath + ".pdf");
             RandomAccessFile raf = new RandomAccessFile(filePath + ".pdf", "r");
             FileChannel channel = raf.getChannel();
             ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
@@ -90,9 +94,6 @@ public class ExportManager implements Printable {
             e.printStackTrace();
         }
 
-        /* User (0,0) is typically outside the imageable area, so we must
-         * translate by the X and Y values in the PageFormat to avoid clipping
-         */
 
         return PAGE_EXISTS;
     }
@@ -102,18 +103,18 @@ public class ExportManager implements Printable {
     }
 
     public void setFilePath(String filePath){
-        this.filePath = new File(filePath.replace(".pdf", "").replace(".txt", ""));
+        this.filePath = filePath.replace(".pdf", "").replace(".txt", "");
     }
 
     public void savePDF(TextEditor textEditor) throws Exception {
-        PdfDocument pdf = new PdfDocument(new PdfWriter(filePath.getPath()+".pdf"));
+        PdfDocument pdf = new PdfDocument(new PdfWriter(filePath + ".pdf"));
         Document doc = new Document(pdf, letter);
         PdfPage page = pdf.addNewPage();
         PdfCanvas pdfCanvas = new PdfCanvas(page);
         makeHeader(pdf, pdfCanvas);
         makeBody(pdf, pdfCanvas, textEditor);
         makeFooter(pdf, pdfCanvas);
-
+        doc.close();
         pdf.close();
     }
 
@@ -160,35 +161,6 @@ public class ExportManager implements Printable {
         canvas.add(d);
     }
 
-    public void newPrinting() throws Exception{
-        DocFlavor flavor = DocFlavor.SERVICE_FORMATTED.PAGEABLE;
-        PrintRequestAttributeSet patts = new HashPrintRequestAttributeSet();
-        patts.add(Sides.DUPLEX);
-        PrintService[] ps = PrintServiceLookup.lookupPrintServices(flavor, patts);
-        if (ps.length == 0) {
-            throw new IllegalStateException("No Printer found");
-        }
-        System.out.println("Available printers: " + Arrays.asList(ps));
-
-        PrintService myService = null;
-        for (PrintService printService : ps) {
-            if (printService.getName().contains("HP")) {
-                myService = printService;
-                break;
-            }
-        }
-
-        if (myService == null) {
-            throw new IllegalStateException("Printer not found");
-        }
-
-        FileInputStream fis = new FileInputStream("data/happyNess.pdf");
-        Doc pdfDoc = new SimpleDoc(fis, DocFlavor.INPUT_STREAM.AUTOSENSE, null);
-        DocPrintJob printJob = myService.createPrintJob();
-        printJob.print(pdfDoc, new HashPrintRequestAttributeSet());
-        fis.close();
-    }
-
 
     public boolean sendEmail(){
 
@@ -197,24 +169,58 @@ public class ExportManager implements Printable {
         email.addRecipient(doctor.toString(), doctor.getEmail(), Message.RecipientType.TO);
         email.setFromAddress("Uptown Villiage Optometry", "mountdougtalks@gmail.com");
         email.setSubject("Refferal for ");
-        email.setText("We should meet up! ;)");
+        email.setText("Please see attached referral letter.\nMary Jean Krawciw/nUptown Villiage Optometry");
 
         try {
-            RandomAccessFile raf = new RandomAccessFile(filePath + ".pdf", "r");
-            byte [] pdfData = new byte[(int)raf.length()];
-            raf.read(pdfData);
-            email.addAttachment("invitation", new FileDataSource(filePath + ".pdf"));
-
+            FileDataSource fd = new FileDataSource(filePath + ".pdf");
+            email.addAttachment("invitation", fd);
 
             //new Mailer("smtp.gmail.com", 25, "javamailno", "thisisasilly", TransportStrategy.SMTP_TLS).sendMail(email);
             new Mailer("smtp.gmail.com", 587, "mountdougtalks", "mdtalks123", TransportStrategy.SMTP_TLS).sendMail(email);
             //new Mailer("smtp.gmail.com", 465, "javamailno@gmail.com", "thisisasilly", TransportStrategy.SMTP_SSL).sendMail(email);
         } catch (Exception e){
             JOptionPane.showMessageDialog(null, e.getMessage());
+
             return false;
         }
         return true;
     }
+
+    public void sendFax(){
+        //get new instance of a fax client (based on internal + external fax4j.properties file data)
+        FaxClient faxClient= FaxClientFactory.createFaxClient();
+
+//create a new fax job
+        FaxJob faxJob=faxClient.createFaxJob();
+
+//set fax job values
+        faxJob.setFilePath("data/test17.txt");
+        faxJob.setPriority(FaxJob.FaxJobPriority.HIGH_PRIORITY);
+        faxJob.setTargetAddress("2503807669");
+        faxJob.setTargetName("Krawciw");
+        faxJob.setSenderEmail("myemail@mycompany.com");
+        faxJob.setSenderName("MyName");
+
+//submit fax job
+        faxClient.submitFaxJob(faxJob);
+
+//print submitted fax job ID (may not be supported by all SPIs)
+        System.out.println("Fax job submitted, ID: "+faxJob.getID());
+    }
+
+    public void startPrint(){
+        PrinterJob job = PrinterJob.getPrinterJob();
+        job.setPrintable(this);
+        boolean ok = job.printDialog();
+        if (ok) {
+            try {
+                job.print();
+            } catch (PrinterException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
 
 
 

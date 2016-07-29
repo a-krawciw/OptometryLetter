@@ -14,6 +14,7 @@ public class Main {
     public static Color mainBlue = new Color(66, 113, 255);
     public static Person [] people;
     public static void main(String [] args){
+        setupFolders();
         loadDoctors();
         op = new OptometryPanel();
         op.showPane();
@@ -22,6 +23,7 @@ public class Main {
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
+        //new ExportManager().sendFax();
     }
 
     public static String [] readFile(String name) throws IOException {
@@ -39,6 +41,22 @@ public class Main {
         lines.toArray(toReturn);
         return toReturn;
 
+    }
+
+    public static String [] readFile(InputStream fis) throws IOException {
+        String s = "";
+
+        try  {
+            int content;
+            while ((content = fis.read()) != -1) {
+                // convert to char and display it
+                s += (char) content;
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return s.split("\n");
     }
 
     public static boolean writeFile(String filePath, String name) {
@@ -76,5 +94,17 @@ public class Main {
             if(people[i].toString().equals(lName)) return people[i];
         }
         return null;
+    }
+
+    public static void setupFolders(){
+        File data = new File("data");
+        if(!data.exists()){
+            data.mkdir();
+        }
+
+        File doctors = new File("data/doctors");
+        if(!doctors.exists()){
+            doctors.mkdir();
+        }
     }
 }

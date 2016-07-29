@@ -14,5 +14,8 @@
     <orderEntry type="library" name="pdf-renderer" level="project" />
     <orderEntry type="library" name="javax.mail" level="project" />
     <orderEntry type="library" name="simple-java-mail-3.1.1" level="project" />
+    <orderEntry type="library" name="comm-2.0" level="project" />
+    <orderEntry type="library" name="apidocs" level="project" />
+    <orderEntry type="library" name="JOrtho_1" level="project" />
   </component>
 </module>

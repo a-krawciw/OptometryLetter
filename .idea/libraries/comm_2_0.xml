@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="comm-2.0">
+    <CLASSES>
+      <root url="file://$USER_HOME$/Downloads/comm-2.0.jar" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$USER_HOME$/Downloads/comm-2.0.jar" recursive="false" />
+  </library>
+</component>

@@ -1,3 +1,7 @@
+import com.inet.jortho.FileUserDictionary;
+import com.inet.jortho.SpellChecker;
+import com.inet.jortho.SpellCheckerOptions;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
@@ -5,6 +9,7 @@ import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Locale;
 
 /**
  * Created by Windows on 2016-07-25.
@@ -12,7 +17,6 @@ import java.io.IOException;
 public class TextEditor extends JTextArea {
 
 
-    ExportManager e = new ExportManager();
     public String filePath = "";
     public Person doc;
 
@@ -32,7 +36,17 @@ public class TextEditor extends JTextArea {
         Font f = Font.decode(Font.SANS_SERIF);
         setFont(f);
         setAutoscrolls(true);
+
+        setLineWrap(true);
+        setWrapStyleWord(true);
+
         setBorder(BorderFactory.createLineBorder(Main.mainBlue, 3));
+        SpellChecker.setUserDictionaryProvider(new FileUserDictionary());
+        SpellChecker.registerDictionaries(this.getClass().getResource("/dictionary"), "en");
+
+
+        SpellChecker.register(this);
+
     }
 
     public TextEditor (){
@@ -61,31 +75,11 @@ public class TextEditor extends JTextArea {
         }
     }
 
-    public void exportPdf(String filePath) throws Exception {
-        e.setFilePath(filePath);
-        e.setDoctor(doc);
-        e.savePDF(this);
-    }
 
-    public void exportPdf() throws Exception {
-        e.setFilePath(filePath + ".pdf");
-        e.savePDF(this);
-    }
 
     public void setDoctor(Person doctor){
         doc = doctor;
     }
 
-    public void startPrint(){
-        PrinterJob job = PrinterJob.getPrinterJob();
-        job.setPrintable(e);
-        boolean ok = job.printDialog();
-        if (ok) {
-            try {
-                job.print();
-            } catch (PrinterException ex) {
-                ex.printStackTrace();
-            }
-        }
-    }
+
 }

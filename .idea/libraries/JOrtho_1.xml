@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="JOrtho_1">
+    <CLASSES>
+      <root url="file://$USER_HOME$/Downloads/JOrtho_1.0" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="file://$USER_HOME$/Downloads/JOrtho_1.0/doc" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="file://$USER_HOME$/Downloads/JOrtho_1.0/src" />
+    </SOURCES>
+    <jarDirectory url="file://$USER_HOME$/Downloads/JOrtho_1.0" recursive="false" />
+  </library>
+</component>
