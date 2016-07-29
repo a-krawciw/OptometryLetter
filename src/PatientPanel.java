@@ -54,6 +54,7 @@ public class PatientPanel extends JDialog {
                 p.setAddress(address.getText());
                 p.setEmail(email.getText());
                 p.setMSP(Integer.parseInt(msp.getText()));
+                p.serialize();
                 setVisible(false);
                 dispose();
             }

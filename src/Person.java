@@ -45,10 +45,10 @@ public class Person implements Serializable{
     public Person(){}
 
 
-    public void serialize(){
+    public void serialize(String filePath){
         try
         {
-            FileOutputStream fileOut = new FileOutputStream("data/doctors/" + lName +".ser");
+            FileOutputStream fileOut = new FileOutputStream(filePath);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(this);
             out.close();

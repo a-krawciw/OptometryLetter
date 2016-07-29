@@ -90,11 +90,36 @@ public class Main {
     }
 
     public static Doctor getDoctor(String lName){
-        for (int i = 0; i < people.length; i++) {
+        for (int i = 0; i < people.length; i++){
             if(people[i].toString().equals(lName)) return people[i];
         }
         return null;
     }
+
+    public static Patient getPatient(String id){
+        Patient [] pats = null;
+        try {
+            File docFolder = new File("data/patients");
+            String [] names = docFolder.list();
+            pats = new Patient[names.length];
+
+            for (int i = 0; i < names.length; i++){
+                FileInputStream fileIn = new FileInputStream("data/patients/" + names[i]);
+                ObjectInputStream in = new ObjectInputStream(fileIn);
+                pats[i] = (Patient) in.readObject();
+                in.close();
+                fileIn.close();
+            }
+            System.out.println(Arrays.toString(names));
+        }catch(Exception i) {
+            i.printStackTrace();
+        }
+        for (int i = 0; i < pats.length; i++) {
+            if(pats[i].toString().equals(id)) return pats[i];
+        }
+        return null;
+    }
+
 
     public static void setupFolders(){
         File data = new File("data");
@@ -105,6 +130,11 @@ public class Main {
         File doctors = new File("data/doctors");
         if(!doctors.exists()){
             doctors.mkdir();
+        }
+
+        File patients = new File("data/patients");
+        if(!patients.exists()){
+            patients.mkdir();
         }
     }
 }

@@ -7,4 +7,8 @@ public class Doctor extends Person {
     public String toString() {
         return "Dr. " + lName;
     }
+
+    public void serialize() {
+        super.serialize("data/doctors/" + lName +".ser");
+    }
 }

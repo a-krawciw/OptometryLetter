@@ -16,4 +16,8 @@ public class Patient extends Person {
     public String toString() {
         return lName + "," + fName + "," + MSP;
     }
+
+    public void serialize() {
+        super.serialize("data/patients/" + lName +"," + fName + ".ser");
+    }
 }
