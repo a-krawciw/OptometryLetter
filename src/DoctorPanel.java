@@ -1,3 +1,7 @@
+import net.miginfocom.layout.BoundSize;
+import net.miginfocom.layout.ComponentWrapper;
+import net.miginfocom.layout.LayoutCallback;
+import net.miginfocom.layout.UnitValue;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -19,27 +23,28 @@ public class DoctorPanel extends JFrame {
     public DoctorPanel(){
         super("Add a doctor");
         getContentPane().setBackground(Color.WHITE);
-        setLayout(new MigLayout("w 300, h 160", "[150px]", "[30px]"));
+        MigLayout mig = new MigLayout("w 300, h 160", "[150px]", "[30px]");
+        setLayout(mig);
 
         add(new JLabel("First Name"));
-        first = new TextEditor();
+        first = new TextEditor(this);
         add(first, "wrap, w 150px!, h 30px!, sg text");
 
         add(new JLabel("Last Name"));
-        last = new TextEditor();
+        last = new TextEditor(this);
         add(last, "wrap, sg text");
 
         add(new JLabel("Address"));
-        address = new TextEditor();
+        address = new TextEditor(this);
         add(address, "wrap, sg text");
 
         add(new JLabel("Email Address"));
-        email = new TextEditor();
+        email = new TextEditor(this);
         add(email, "wrap, sg text");
-
-        add(new JLabel("Fax Number"));
-        fax = new TextEditor();
-        add(fax, "wrap, sg text");
+//
+//        add(new JLabel("Fax Number"));
+//        fax = new TextEditor(this);
+//        add(fax, "wrap, sg text");
 
         submit = new OpButton("Submit", new ActionListener() {
             @Override
@@ -49,7 +54,7 @@ public class DoctorPanel extends JFrame {
                 p.setLastName(last.getText());
                 p.setAddress(address.getText());
                 p.setEmail(email.getText());
-                p.setFax(fax.getText());
+                p.setFax("");
                 p.serialize();
                 DoctorPanel.super.dispose();
             }

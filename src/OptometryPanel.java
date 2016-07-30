@@ -2,10 +2,7 @@
 import net.miginfocom.swing.MigLayout;
 
 import javax.imageio.ImageIO;
-import javax.imageio.stream.FileImageInputStream;
 import javax.swing.*;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -230,7 +227,7 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
                     File file = browse.getSelectedFile();
                     editor.saveContents(file.getPath().replace(".txt", "")+".txt");
                     e.setFilePath(file.getPath());
-                    currentFile.setText("Currently editing" + file.getName());
+                    currentFile.setText("Currently editing " + file.getName());
                 }
 
 
@@ -256,11 +253,12 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
                     JOptionPane.showMessageDialog(OptometryPanel.this, "You must choose a doctor first");
                     return;
                 }
-                if(e.sendEmail()){
+                int answer  = JOptionPane.showConfirmDialog(OptometryPanel.this, "Are you sure you want to email " + e.doctor);
+                if(answer == JOptionPane.YES_OPTION && e.sendEmail()){
                     JOptionPane.showMessageDialog(OptometryPanel.this, "Email sent");
                 }
             } else if (event.getSource().equals(patientAdd)){
-                Patient p = new PatientPanel(OptometryPanel.this).getPatientInormation();
+                Patient p = new PatientPanel(OptometryPanel.this).getPatientInformation();
                 System.out.println(p);
             }
         }
