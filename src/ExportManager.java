@@ -2,16 +2,17 @@
 
 
 import com.itextpdf.io.font.FontConstants;
+import com.itextpdf.kernel.color.*;
+import com.itextpdf.kernel.color.Color;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.PageSize;
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfPage;
-import com.itextpdf.kernel.pdf.PdfReader;
-import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.kernel.pdf.*;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 
 import com.itextpdf.kernel.geom.Rectangle;
+import com.itextpdf.kernel.pdf.colorspace.PdfCieBasedCs;
+import com.itextpdf.kernel.pdf.colorspace.PdfColorSpace;
 import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
@@ -41,6 +42,7 @@ import javax.print.event.PrintJobEvent;
 import javax.print.event.PrintJobListener;
 import javax.swing.*;
 import java.awt.*;
+//import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
@@ -61,8 +63,10 @@ import java.util.Properties;
  */
 public class ExportManager implements Printable {
     Doctor doctor;
+    Patient patient;
     String filePath = "";
     PageSize letter = new PageSize(new Rectangle(612, 792));
+    Color extraLightGrey;
 
 
     @Override
@@ -85,7 +89,7 @@ public class ExportManager implements Printable {
 
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-            PDFRenderer renderer = new PDFRenderer(page, g2d, new java.awt.Rectangle(0, 0, 612, 792), null, Color.RED);
+            PDFRenderer renderer = new PDFRenderer(page, g2d, new java.awt.Rectangle(0, 0, 612, 792), null, java.awt.Color.RED);
             page.waitForFinish();
             renderer.run();
             channel.close();
@@ -102,6 +106,10 @@ public class ExportManager implements Printable {
         doctor = p;
     }
 
+    public void setPatient(Patient p){
+        this.patient = p;
+    }
+
     public void setFilePath(String filePath){
         this.filePath = filePath.replace(".pdf", "").replace(".txt", "");
     }
@@ -111,11 +119,24 @@ public class ExportManager implements Printable {
         Document doc = new Document(pdf, letter);
         PdfPage page = pdf.addNewPage();
         PdfCanvas pdfCanvas = new PdfCanvas(page);
-        makeHeader(pdf, pdfCanvas);
-        makeBody(pdf, pdfCanvas, textEditor);
-        makeFooter(pdf, pdfCanvas);
+        makeBorder(pdf, pdfCanvas);
+       // makeHeader(pdf, pdfCanvas);
+       // makeBody(pdf, pdfCanvas, textEditor);
+       // makeFooter(pdf, pdfCanvas);
         doc.close();
         pdf.close();
+    }
+
+    private void makeBorder(PdfDocument doc, PdfCanvas pdf) throws Exception{
+        pdf.roundRectangle(20, 20,  572, 752, 5);
+        pdf.setLineWidth(15);
+        pdf.setStrokeColor(new DeviceRgb(240, 240, 240));
+        pdf.stroke();
+
+        pdf.rectangle(25, 25, 552, 732);
+        pdf.setLineWidth(5);
+        pdf.setStrokeColor(com.itextpdf.kernel.color.Color.LIGHT_GRAY);
+        pdf.stroke();
     }
 
     private void makeHeader(PdfDocument doc, PdfCanvas pdf) throws Exception{

@@ -27,23 +27,23 @@ public class DoctorPanel extends JFrame {
         setLayout(mig);
 
         add(new JLabel("First Name"));
-        first = new TextEditor(this);
+        first = new TextEditor(false);
         add(first, "wrap, w 150px!, h 30px!, sg text");
 
         add(new JLabel("Last Name"));
-        last = new TextEditor(this);
+        last = new TextEditor(false);
         add(last, "wrap, sg text");
 
         add(new JLabel("Address"));
-        address = new TextEditor(this);
+        address = new TextEditor(false);
         add(address, "wrap, sg text");
 
         add(new JLabel("Email Address"));
-        email = new TextEditor(this);
+        email = new TextEditor(false);
         add(email, "wrap, sg text");
 //
 //        add(new JLabel("Fax Number"));
-//        fax = new TextEditor(this);
+//        fax = new TextEditor(false);
 //        add(fax, "wrap, sg text");
 
         submit = new OpButton("Submit", new ActionListener() {

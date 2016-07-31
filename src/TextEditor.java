@@ -1,12 +1,12 @@
 import com.inet.jortho.FileUserDictionary;
 import com.inet.jortho.SpellChecker;
 import com.inet.jortho.SpellCheckerOptions;
+import com.itextpdf.layout.element.Text;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
+import java.awt.event.*;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.FileNotFoundException;
@@ -16,7 +16,7 @@ import java.util.Locale;
 /**
  * Created by Windows on 2016-07-25.
  */
-public class TextEditor extends JTextArea implements ComponentListener {
+public class TextEditor extends JTextArea implements FocusListener, KeyListener {
 
 
     public String filePath = "";
@@ -30,9 +30,10 @@ public class TextEditor extends JTextArea implements ComponentListener {
         Font f = Font.decode(Font.SANS_SERIF);
         setFont(f);
         setAutoscrolls(true);
+
     }
 
-    public TextEditor(String line){
+    public TextEditor(String line, boolean spellCheck){
         super();
         super.setText(line);
         setEditable(true);
@@ -44,10 +45,23 @@ public class TextEditor extends JTextArea implements ComponentListener {
         setWrapStyleWord(true);
 
         setBorder(BorderFactory.createLineBorder(Main.mainBlue, 3));
-        SpellChecker.setUserDictionaryProvider(new FileUserDictionary());
-        SpellChecker.registerDictionaries(this.getClass().getResource("/dictionary"), "en");
-        SpellChecker.register(this);
+        addFocusListener(this);
+        addKeyListener(this);
 
+
+        if(spellCheck) {
+            SpellChecker.setUserDictionaryProvider(new FileUserDictionary());
+            SpellChecker.registerDictionaries(this.getClass().getResource("/dictionary"), "en");
+            SpellChecker.register(this);
+        }
+    }
+
+    public TextEditor(String line){
+        this(line, true);
+    }
+
+    public TextEditor(boolean b){
+        this("", b);
     }
 
 
@@ -89,27 +103,35 @@ public class TextEditor extends JTextArea implements ComponentListener {
     }
 
 
-    public void setContainer(Frame c){
-        this.c = c;
-    }
     @Override
-    public void componentResized(ComponentEvent e) {
-        if(c != null)
-            c.pack();
+    public void focusGained(FocusEvent e) {
+        setBorder(BorderFactory.createLineBorder(Color.RED, 3));
     }
 
     @Override
-    public void componentMoved(ComponentEvent e) {
+    public void focusLost(FocusEvent e) {
+        setBorder(BorderFactory.createLineBorder(Main.mainBlue, 3));
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        System.out.println("j" + e.getKeyCode());
+        if(e.getKeyCode() == 0){
+            System.out.println("Hello");
+            transferFocus();
+            e.consume();
+        }
+
 
     }
 
     @Override
-    public void componentShown(ComponentEvent e) {
+    public void keyPressed(KeyEvent e) {
 
     }
 
     @Override
-    public void componentHidden(ComponentEvent e) {
+    public void keyReleased(KeyEvent e) {
 
     }
 }

@@ -39,6 +39,7 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
     private OpButton print;
     private OpButton back;
     private JLabel currentFile;
+    private JLabel currentPatient;
 
 
     private JComboBox<Doctor> people;
@@ -115,8 +116,11 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
             e.printStackTrace();
         }
         currentFile = new JLabel("Currently editing " + e.filePath);
+        currentPatient = new JLabel("No patient entered");
 
-        editorScreen.add(back);
+        editorScreen.add(back, "flowx, split 3");
+        editorScreen.add(currentFile, "cell 0 0");
+        editorScreen.add(currentPatient, "cell 0 0");
         editorScreen.add(editor, "w 80%, h 90%, wrap");
         editorScreen.add(patientAdd, "cell 1 1, growx, gapbottom 15px");
         editorScreen.add(docAdd, "cell 1 1, growx, gapbottom 40px");
@@ -124,7 +128,6 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
         editorScreen.add(savePdf, "cell 1 1, growx, gapbottom 15px");
         editorScreen.add(email, "cell 1 1, growx, gapbottom 15px");
         editorScreen.add(print, "cell 1 1, growx");
-        editorScreen.add(currentFile, "cell 0 0, flowx");
 
 
         createDoctorList();
@@ -212,7 +215,9 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
                     JOptionPane.showMessageDialog(OptometryPanel.this, "File could not be opened");
                 }
 
-                people.setSelectedItem(Main.getDoctor(text[0]));
+                if(!text[0].equals("null"))
+                    people.setSelectedItem(Main.getDoctor(text[0]));
+
                 setStage(EDITOR);
                 editor.setText(text);
             } else if(event.getSource().equals(docAdd)){
@@ -259,6 +264,8 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
                 }
             } else if (event.getSource().equals(patientAdd)){
                 Patient p = new PatientPanel(OptometryPanel.this).getPatientInformation();
+                e.setPatient(p);
+                currentPatient.setText("Current Patient: " + p);
                 System.out.println(p);
             }
         }

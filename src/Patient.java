@@ -41,7 +41,7 @@ public class Patient extends Person {
         double IOP = 0;
         String IOPTime = "";
         double sphere = 0;
-        double angle = 0;
+        double axis = 0;
         double cyl = 0;
         double add = 0;
 
@@ -85,12 +85,12 @@ public class Patient extends Person {
             this.sphere = sphere;
         }
 
-        public double getAngle() {
-            return angle;
+        public double getAxis() {
+            return axis;
         }
 
-        public void setAngle(double angle) {
-            this.angle = angle;
+        public void setAxis(double axis) {
+            this.axis = axis;
         }
 
         public double getCyl() {
