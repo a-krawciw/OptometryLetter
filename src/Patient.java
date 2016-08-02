@@ -1,3 +1,4 @@
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -35,7 +36,7 @@ public class Patient extends Person {
         super.serialize("data/patients/" + lName +"," + fName + ".ser");
     }
 
-    class Eye {
+    class Eye implements Serializable {
         double vaUncorrected = 0;
         double vaCorrected = 0;
         double IOP = 0;

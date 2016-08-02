@@ -11,7 +11,7 @@ import java.beans.PropertyChangeListener;
 /**
  * Created by Windows on 2016-07-28.
  */
-public class PatientPanel extends JPanel {
+public abstract class PatientPanel extends JPanel {
     JFrame frame;
     private Patient p;
     JTextArea first;
@@ -171,11 +171,14 @@ public class PatientPanel extends JPanel {
                     p.os.setCyl(Double.parseDouble(sphOs.getText()));
                     p.os.setAxis(Double.parseDouble(axisOs.getText()));
                 }catch (Exception ex){
+                    ex.printStackTrace();
                     JOptionPane.showMessageDialog(PatientPanel.this, "One of your number fields has a letter in it");
                     return;
                 }
 
                 p.serialize();
+                patientInfoCompleted(p);
+                System.out.println(p + "l");
                 frame.setVisible(false);
                 frame.dispose();
             }
@@ -186,12 +189,10 @@ public class PatientPanel extends JPanel {
         frame.add(this);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.pack();
+        frame.setVisible(true);
     }
 
-    public Patient getPatientInformation(){
-        frame.setVisible(true);
-        return p;
-    }
+    public abstract void patientInfoCompleted(Patient p);
 
     private Action tabFocus = new AbstractAction() {
         @Override

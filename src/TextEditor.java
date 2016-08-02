@@ -43,6 +43,7 @@ public class TextEditor extends JTextArea implements FocusListener, KeyListener 
 
         setLineWrap(true);
         setWrapStyleWord(true);
+        setFocusTraversalKeysEnabled(false);
 
         setBorder(BorderFactory.createLineBorder(Main.mainBlue, 3));
         addFocusListener(this);
@@ -115,19 +116,15 @@ public class TextEditor extends JTextArea implements FocusListener, KeyListener 
 
     @Override
     public void keyTyped(KeyEvent e) {
-        System.out.println("j" + e.getKeyCode());
-        if(e.getKeyCode() == 0){
-            System.out.println("Hello");
-            transferFocus();
-            e.consume();
-        }
-
 
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-
+        if(e.getKeyCode() == KeyEvent.VK_TAB){
+            transferFocus();
+            e.consume();
+        }
     }
 
     @Override

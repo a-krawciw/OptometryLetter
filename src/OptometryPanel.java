@@ -246,6 +246,7 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
                     e.savePDF(editor);
                     JOptionPane.showMessageDialog(OptometryPanel.this, e.filePath + ".pdf exported successfully");
                 } catch (Exception e1) {
+                    e1.printStackTrace();
                     JOptionPane.showMessageDialog(OptometryPanel.this, "The pdf is open in another program. \nYou must close that program in order to continue.");
                 }
             } else if(event.getSource().equals(back)){
@@ -263,10 +264,15 @@ public class OptometryPanel extends JFrame implements WindowFocusListener {
                     JOptionPane.showMessageDialog(OptometryPanel.this, "Email sent");
                 }
             } else if (event.getSource().equals(patientAdd)){
-                Patient p = new PatientPanel(OptometryPanel.this).getPatientInformation();
-                e.setPatient(p);
-                currentPatient.setText("Current Patient: " + p);
-                System.out.println(p);
+                new PatientPanel(OptometryPanel.this){
+                    @Override
+                    public void patientInfoCompleted(Patient p) {
+                        e.setPatient(p);
+                        currentPatient.setText("Current Patient: " + p);
+                        System.out.println(p);
+                    }
+                };
+
             }
         }
     }

@@ -11,14 +11,13 @@ import com.itextpdf.kernel.pdf.*;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 
 import com.itextpdf.kernel.geom.Rectangle;
-import com.itextpdf.kernel.pdf.colorspace.PdfCieBasedCs;
-import com.itextpdf.kernel.pdf.colorspace.PdfColorSpace;
 import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.element.Div;
-import com.itextpdf.layout.element.Text;
+import com.itextpdf.layout.border.Border;
+import com.itextpdf.layout.border.SolidBorder;
+import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.TextAlignment;
+import com.itextpdf.layout.property.VerticalAlignment;
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
 import com.sun.pdfview.PDFRenderer;
@@ -32,31 +31,16 @@ import org.fax4j.FaxJob;
 
 import javax.activation.FileDataSource;
 import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.print.*;
-import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.PrintRequestAttributeSet;
-import javax.print.attribute.standard.Sides;
-import javax.print.event.PrintJobEvent;
-import javax.print.event.PrintJobListener;
 import javax.swing.*;
 import java.awt.*;
-//import java.awt.Color;
-import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.Properties;
 
 /**
  * Created by Windows on 2016-07-26.
@@ -67,7 +51,17 @@ public class ExportManager implements Printable {
     String filePath = "";
     PageSize letter = new PageSize(new Rectangle(612, 792));
     Color extraLightGrey;
+    PdfFont calibri;
 
+    public ExportManager(){
+
+        PdfFontFactory.register("C:/Windows/Fonts/calibri.ttf", "calibri");
+        try {
+            calibri = PdfFontFactory.createRegisteredFont("calibri");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public int print(Graphics g, PageFormat pf, int pageIndex) throws PrinterException {
@@ -120,8 +114,8 @@ public class ExportManager implements Printable {
         PdfPage page = pdf.addNewPage();
         PdfCanvas pdfCanvas = new PdfCanvas(page);
         makeBorder(pdf, pdfCanvas);
-       // makeHeader(pdf, pdfCanvas);
-       // makeBody(pdf, pdfCanvas, textEditor);
+        makeHeader(pdf, pdfCanvas);
+        makeBody(pdf, pdfCanvas, textEditor);
        // makeFooter(pdf, pdfCanvas);
         doc.close();
         pdf.close();
@@ -130,39 +124,150 @@ public class ExportManager implements Printable {
     private void makeBorder(PdfDocument doc, PdfCanvas pdf) throws Exception{
         pdf.roundRectangle(20, 20,  572, 752, 5);
         pdf.setLineWidth(15);
-        pdf.setStrokeColor(new DeviceRgb(240, 240, 240));
+        pdf.setStrokeColor(com.itextpdf.kernel.color.Color.LIGHT_GRAY);
         pdf.stroke();
 
-        pdf.rectangle(25, 25, 552, 732);
+        pdf.rectangle(30, 30, 552, 732);
         pdf.setLineWidth(5);
-        pdf.setStrokeColor(com.itextpdf.kernel.color.Color.LIGHT_GRAY);
+
+        pdf.setStrokeColor(new DeviceRgb(240, 240, 240));
         pdf.stroke();
     }
 
     private void makeHeader(PdfDocument doc, PdfCanvas pdf) throws Exception{
-        Rectangle rectangle = new Rectangle(30, 662, 552, 100);
-        pdf.rectangle(rectangle);
+
+
+        Rectangle info = new Rectangle(33, 672, 465, 15);
+        pdf.rectangle(info);
+        pdf.setFillColor(Color.GRAY);
+        pdf.fill();
+
+        pdf.rectangle(33, 672, 465, 60);
+        pdf.setLineWidth(1);
+        pdf.setStrokeColor(Color.BLACK);
         pdf.stroke();
-        Canvas canvas = new Canvas(pdf, doc, rectangle);
+
+        Rectangle box = new Rectangle(508, 672, 60, 60);
+        pdf.rectangle(box);
+        pdf.setFillColor(Color.LIGHT_GRAY);
+        pdf.fill();
+
+        pdf.rectangle(box);
+        pdf.stroke();
+
+
+        Rectangle headBox = new Rectangle(33, 687, 465, 45);
+
+        Canvas c1 = new Canvas(pdf, doc, headBox);
         PdfFont bold = PdfFontFactory.createFont(FontConstants.TIMES_BOLD);
-        Text title = new Text("Uptown Village Optometry\n3450 Uptown Blvd, Victoria, BC V8Z 0B9\n" +
-                "(250) 382-2682").setFont(bold);
+        Text title = new Text("Uptown Village Optometry".toUpperCase()).setFont(bold).setFontSize(18).setFontColor(Color.BLACK);
         Paragraph p = new Paragraph().add(title);
         p.setTextAlignment(TextAlignment.CENTER);
-        canvas.add(p);
+        p.setVerticalAlignment(VerticalAlignment.MIDDLE);
+        c1.add(p);
+
+        Canvas c2 = new Canvas(pdf, doc, info);
+        Text address = new Text("107-3450 Uptown BLVD. Victoria, BC V8Z 0B9 PH. 250-382-2682 FX.250-382-2687".toUpperCase()).setFont(calibri).setFontSize(10).setFontColor(Color.WHITE);
+        Paragraph p2 = new Paragraph().add(address);
+        p2.setTextAlignment(TextAlignment.CENTER);
+        p2.setVerticalAlignment(VerticalAlignment.MIDDLE);
+        c2.add(p2);
+
+        
+        
     }
 
     private void makeBody(PdfDocument doc, PdfCanvas pdf, TextEditor text) throws Exception{
-        Rectangle rectangle = new Rectangle(30, 90, 552, 562);
-        pdf.rectangle(rectangle);
-        pdf.stroke();
+        Rectangle rectangle = new Rectangle(34, 90, 544, 562);
+
         Canvas canvas = new Canvas(pdf, doc, rectangle);
-        PdfFont font = PdfFontFactory.createFont(FontConstants.TIMES_ROMAN);
-        Text name = new Text("Dear " + doctor + ",\n");
-        Text body = new Text(text.getText()).setFont(font);
-        Paragraph p = new Paragraph().add(name).add(body);
+
+        Text name = new Text(
+                "DR." + doctor.getfName().toUpperCase() + " " + doctor.getlName().toUpperCase() + "\n" +
+                doctor.getAddress() + "\n" +
+                "RE:" + patient.getlName().toUpperCase() + ", " + patient.getfName() + "\t\tDOB: " + patient.getDob() +
+                "\nMSP: " + patient.getMSP() +
+                "\n\nDear Dr. " + doctor.getlName() + ","
+        ).setFont(calibri).setFontColor(Color.BLACK);
+        Paragraph p = new Paragraph().add(name);
         p.setTextAlignment(TextAlignment.LEFT);
         canvas.add(p);
+
+        Text message = new Text(text.getText()).setFont(calibri).setFontColor(Color.BLACK);
+        Paragraph p2 = new Paragraph().add(message);
+        p2.addTabStops(new TabStop(3));
+        p2.setTextAlignment(TextAlignment.LEFT);
+        canvas.add(p2);
+
+        Table t = new Table(3){
+            @Override
+            public Table addCell(String content) {
+                Cell c = new Cell();
+                c.setBorder(new Border(Color.WHITE, 1) {
+                    @Override
+                    public void draw(PdfCanvas canvas, float x1, float y1, float x2, float y2, float borderWidthBefore, float borderWidthAfter) {
+
+                    }
+
+                    @Override
+                    public void drawCellBorder(PdfCanvas canvas, float x1, float y1, float x2, float y2) {
+
+                    }
+
+                    @Override
+                    public int getType() {
+                        return 0;
+                    }
+                });
+                c.add(content);
+                return super.addCell(c);
+            }
+        };
+
+
+        t.setFontColor(Color.BLACK);
+        t.setFont(calibri);
+        t.setStrokeColor(Color.WHITE);
+        t.addCell("");
+        t.addCell("OD");
+        t.addCell("OS");
+
+        t.startNewRow();
+        t.addCell("VA uncorrected");
+        t.addCell(patient.od.getVaUncorrected() + "/20");
+        t.addCell(patient.os.getVaUncorrected() + "/20");
+
+        t.startNewRow();
+        t.addCell("VA Corrected");
+        t.addCell(patient.od.getVaCorrected() + "/20");
+        t.addCell(patient.os.getVaCorrected() + "/20");
+
+        t.startNewRow();
+        t.addCell("IOP:");
+        t.addCell(patient.od.getIOP() + "mmHg");
+        t.addCell(patient.os.getIOP() + "mmHg");
+
+        t.startNewRow();
+        t.addCell("@Time");
+        t.addCell(patient.od.getIOPTime());
+
+        t.startNewRow();
+        t.addCell("Rx");
+        t.addCell("Sph x Cyl x Axis");
+        t.addCell("Sph x Cyl x Axis");
+
+        t.startNewRow();
+        t.addCell("");
+        t.addCell(patient.od.getSphere() + " x " + patient.od.getCyl() + " x " + patient.od.getAxis());
+        t.addCell(patient.os.getSphere() + " x " + patient.os.getCyl() + " x " + patient.os.getAxis());
+
+        t.startNewRow();
+        t.addCell("");
+        t.addCell("Add:" + patient.od.getAdd());
+        t.addCell("Add:" + patient.os.getAdd());
+        canvas.add(t);
+
+
     }
 
     private void makeFooter(PdfDocument doc, PdfCanvas pdf) throws Exception{
