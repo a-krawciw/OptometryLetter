@@ -150,10 +150,10 @@ public abstract class PatientPanel extends JPanel {
                 p.setFirstName(first.getText());
                 p.setLastName(last.getText());
                 p.setAddress(address.getText());
-                p.setEmail(dob.getText());
+                p.setDob(dob.getText());
 
                 try {
-                    p.setMSP(Integer.parseInt(msp.getText()));
+                    p.setMSP(Long.parseLong(msp.getText()));
 
                     p.od.setVaUncorrected(Double.parseDouble(vaUncorrectedOd.getText()));
                     p.od.setVaCorrected(Double.parseDouble(vaCorrectedOd.getText()));

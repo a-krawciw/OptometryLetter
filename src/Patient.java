@@ -8,24 +8,22 @@ public class Patient extends Person {
     public Eye od = new Eye();
     public Eye os = new Eye();
 
-    public Date getDob() {
-        return dob;
-    }
-
-    public void setDob(Date dob) {
+    private String dob = "";
+    public void setDob(String dob) {
         this.dob = dob;
     }
 
-    private Date dob;
-    public int getMSP() {
+    public String getDob(){return dob;}
+
+    public long getMSP() {
         return MSP;
     }
 
-    public void setMSP(int MSP) {
+    public void setMSP(long MSP) {
         this.MSP = MSP;
     }
 
-    private int MSP = -1;
+    private long MSP = -1;
 
     @Override
     public String toString() {

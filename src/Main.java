@@ -3,6 +3,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -88,15 +89,18 @@ public class Main {
                 in.close();
                 fileIn.close();
             }
-            System.out.println(Arrays.toString(names));
+            System.out.println(Arrays.toString(people));
         }catch(Exception i) {
             i.printStackTrace();
         }
     }
 
     public static Doctor getDoctor(String lName){
+        System.out.println("k" + Arrays.toString(people));
         for (int i = 0; i < people.length; i++){
-            if(people[i].toString().equals(lName)) return people[i];
+            if(people[i].toString().equals(lName)){
+                return people[i];
+            }
         }
         return null;
     }
@@ -115,7 +119,7 @@ public class Main {
                 in.close();
                 fileIn.close();
             }
-            System.out.println(Arrays.toString(names));
+            System.out.println("k" + Arrays.toString(pats));
         }catch(Exception i) {
             i.printStackTrace();
         }
@@ -140,6 +144,28 @@ public class Main {
         File patients = new File("data/patients");
         if(!patients.exists()){
             patients.mkdir();
+        }
+
+        File fonts = new File("data/fonts");
+        if(!fonts.exists()){
+            fonts.mkdir();
+
+            copyInputStreamToFile(Main.class.getResourceAsStream("./calibri.ttf"), new File("data/fonts/calibri.ttf"));
+        }
+    }
+
+    private static void copyInputStreamToFile( InputStream in, File file ) {
+        try {
+            OutputStream out = new FileOutputStream(file);
+            byte[] buf = new byte[1024];
+            int len;
+            while((len=in.read(buf))>0){
+                out.write(buf,0,len);
+            }
+            out.close();
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

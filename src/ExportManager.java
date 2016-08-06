@@ -55,7 +55,7 @@ public class ExportManager implements Printable {
 
     public ExportManager(){
 
-        PdfFontFactory.register("C:/Windows/Fonts/calibri.ttf", "calibri");
+        PdfFontFactory.register("data/fonts/calibri.ttf", "calibri");
         try {
             calibri = PdfFontFactory.createRegisteredFont("calibri");
         } catch (IOException e) {
@@ -116,7 +116,6 @@ public class ExportManager implements Printable {
         makeBorder(pdf, pdfCanvas);
         makeHeader(pdf, pdfCanvas);
         makeBody(pdf, pdfCanvas, textEditor);
-       // makeFooter(pdf, pdfCanvas);
         doc.close();
         pdf.close();
     }
@@ -184,20 +183,19 @@ public class ExportManager implements Printable {
 
         Text name = new Text(
                 "DR." + doctor.getfName().toUpperCase() + " " + doctor.getlName().toUpperCase() + "\n" +
-                doctor.getAddress() + "\n" +
+                doctor.getAddress() + "\n\n" +
                 "RE:" + patient.getlName().toUpperCase() + ", " + patient.getfName() + "\t\tDOB: " + patient.getDob() +
-                "\nMSP: " + patient.getMSP() +
-                "\n\nDear Dr. " + doctor.getlName() + ","
+                "\nMSP: " + patient.getMSP()
         ).setFont(calibri).setFontColor(Color.BLACK);
-        Paragraph p = new Paragraph().add(name);
-        p.setTextAlignment(TextAlignment.LEFT);
-        canvas.add(p);
+        Paragraph info = new Paragraph().add(name);
+        info.setTextAlignment(TextAlignment.LEFT);
 
-        Text message = new Text(text.getText()).setFont(calibri).setFontColor(Color.BLACK);
-        Paragraph p2 = new Paragraph().add(message);
-        p2.addTabStops(new TabStop(3));
-        p2.setTextAlignment(TextAlignment.LEFT);
-        canvas.add(p2);
+        Text message = new Text(
+                "\nDear Dr. " + doctor.getlName() + ",\n" + text.getText() +"\n\nMary Jean Krawciw, OD" ).setFont(calibri).setFontColor(Color.BLACK);
+
+        Paragraph letter = new Paragraph().add(message);
+        letter.addTabStops(new TabStop(3));
+        letter.setTextAlignment(TextAlignment.LEFT);
 
         Table t = new Table(3){
             @Override
@@ -219,11 +217,13 @@ public class ExportManager implements Printable {
                         return 0;
                     }
                 });
+               // c.setWidth(100);
                 c.add(content);
                 return super.addCell(c);
             }
         };
 
+       // t.setWidth(300);
 
         t.setFontColor(Color.BLACK);
         t.setFont(calibri);
@@ -265,26 +265,13 @@ public class ExportManager implements Printable {
         t.addCell("");
         t.addCell("Add:" + patient.od.getAdd());
         t.addCell("Add:" + patient.os.getAdd());
+
+
+        canvas.add(info);
         canvas.add(t);
+        canvas.add(letter);
 
 
-    }
-
-    private void makeFooter(PdfDocument doc, PdfCanvas pdf) throws Exception{
-        Rectangle rectangle = new Rectangle(30, 30, 552, 50);
-        pdf.rectangle(rectangle);
-        pdf.stroke();
-        Canvas canvas = new Canvas(pdf, doc, rectangle);
-        PdfFont bold = PdfFontFactory.createFont(FontConstants.TIMES_BOLD);
-        Text title = new Text("Mary Jean Krawciw").setFont(bold);
-        Paragraph p = new Paragraph().add(title);
-        p.setTextAlignment(TextAlignment.LEFT);
-
-        Text date = new Text(new Date().toString()).setFont(bold);
-        Paragraph p2 = new Paragraph().add(date);
-        p2.setTextAlignment(TextAlignment.RIGHT);
-        Div d = new Div().add(p2).add(p);
-        canvas.add(d);
     }
 
 
@@ -347,6 +334,25 @@ public class ExportManager implements Printable {
         }
     }
 
+    public void save(String toSave){
+        if(!Main.writeFile(filePath + ".txt", doctor + "\n" + patient + "\n" + toSave)){
+            JOptionPane.showMessageDialog(null, "File could not be saved");
+        }
+    }
+
+    public String getFileName(){
+        String [] temp = filePath.split("\\\\");
+        return temp[temp.length - 1];
+    }
+
+    public boolean hasAllInformation(){
+        return patient != null && doctor != null;
+    }
+
+    public boolean isPrintable(){
+        File f = new File(filePath + ".pdf");
+        return f.exists();
+    }
 
 
 

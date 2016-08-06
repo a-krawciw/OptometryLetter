@@ -78,7 +78,7 @@ public class TextEditor extends JTextArea implements FocusListener, KeyListener 
     private String arrayAsOne(String [] lines){
         String expanded = "";
         doc = Main.getDoctor(lines[0]);
-        for (int i = 1; i < lines.length; i++){
+        for (int i = 2; i < lines.length; i++){
             expanded += lines[i] + "\n";
         }
         return expanded;
@@ -88,13 +88,8 @@ public class TextEditor extends JTextArea implements FocusListener, KeyListener 
         setText(arrayAsOne(lines));
     }
 
-    public void saveContents(String filePath){
-        filePath = filePath.replace(".txt", "");
-        if(!Main.writeFile(filePath + ".txt", doc + "\n" + getText())){
-            JOptionPane.showMessageDialog(this, "File could not be saved");
-        } else {
-            this.filePath = filePath.replace(".txt", "");
-        }
+    public void saveContents(ExportManager e){
+        e.save(getText());
     }
 
 
