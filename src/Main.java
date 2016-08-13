@@ -66,6 +66,7 @@ public class Main {
     }
 
     public static boolean writeFile(String filePath, String name) {
+        System.out.println("hiya" + filePath);
         try{
             BufferedWriter out = new BufferedWriter(new FileWriter(filePath));
             out.write(name);
@@ -149,23 +150,17 @@ public class Main {
         File fonts = new File("data/fonts");
         if(!fonts.exists()){
             fonts.mkdir();
-
-            copyInputStreamToFile(Main.class.getResourceAsStream("./calibri.ttf"), new File("data/fonts/calibri.ttf"));
-        }
-    }
-
-    private static void copyInputStreamToFile( InputStream in, File file ) {
-        try {
-            OutputStream out = new FileOutputStream(file);
-            byte[] buf = new byte[1024];
-            int len;
-            while((len=in.read(buf))>0){
-                out.write(buf,0,len);
+            try {
+                InputStream fis = Main.class.getResourceAsStream("/calibri.ttf");
+                System.out.println("k" + fis.available());
+                Files.copy(fis, new File("data/fonts/calibri.ttf").toPath());
+            } catch (Exception e){
+                e.printStackTrace();
             }
-            out.close();
-            in.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+
         }
+
+
     }
+
 }

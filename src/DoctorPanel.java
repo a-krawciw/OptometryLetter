@@ -23,7 +23,7 @@ public class DoctorPanel extends JFrame {
     public DoctorPanel(){
         super("Add a doctor");
         getContentPane().setBackground(Color.WHITE);
-        MigLayout mig = new MigLayout("w 300, h 160", "[150px]", "[30px]");
+        MigLayout mig = new MigLayout("pack", "[150px]", "[30px]");
         setLayout(mig);
 
         add(new JLabel("First Name"));
@@ -38,13 +38,13 @@ public class DoctorPanel extends JFrame {
         address = new TextEditor(false);
         add(address, "wrap, sg text");
 
+        add(new JLabel("Fax"));
+        fax = new TextEditor(false);
+        add(fax, "wrap, sg text");
+
         add(new JLabel("Email Address"));
         email = new TextEditor(false);
         add(email, "wrap, sg text");
-//
-//        add(new JLabel("Fax Number"));
-//        fax = new TextEditor(false);
-//        add(fax, "wrap, sg text");
 
         submit = new OpButton("Submit", new ActionListener() {
             @Override
@@ -54,7 +54,7 @@ public class DoctorPanel extends JFrame {
                 p.setLastName(last.getText());
                 p.setAddress(address.getText());
                 p.setEmail(email.getText());
-                p.setFax("");
+                p.setFax(fax.getText());
                 p.serialize();
                 DoctorPanel.super.dispose();
             }
@@ -63,6 +63,8 @@ public class DoctorPanel extends JFrame {
         add(submit);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         pack();
+        this.setLocation(OptometryPanel.screenSize.width / 2 - this.getSize().width / 2, OptometryPanel.screenSize.height / 2 - this.getSize().height / 2);
+
         setVisible(true);
     }
 

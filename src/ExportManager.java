@@ -110,6 +110,7 @@ public class ExportManager implements Printable {
 
     public void savePDF(TextEditor textEditor) throws Exception {
         PdfDocument pdf = new PdfDocument(new PdfWriter(filePath + ".pdf"));
+        System.out.println("Hiya" + filePath);
         Document doc = new Document(pdf, letter);
         PdfPage page = pdf.addNewPage();
         PdfCanvas pdfCanvas = new PdfCanvas(page);
@@ -117,7 +118,7 @@ public class ExportManager implements Printable {
         makeHeader(pdf, pdfCanvas);
         makeBody(pdf, pdfCanvas, textEditor);
         doc.close();
-        pdf.close();
+
     }
 
     private void makeBorder(PdfDocument doc, PdfCanvas pdf) throws Exception{
@@ -182,10 +183,11 @@ public class ExportManager implements Printable {
         Canvas canvas = new Canvas(pdf, doc, rectangle);
 
         Text name = new Text(
-                "DR." + doctor.getfName().toUpperCase() + " " + doctor.getlName().toUpperCase() + "\n" +
+                "DR." + doctor.getfName().toUpperCase() + " " + doctor.getlName().toUpperCase() + "    Fax: " + doctor.getFax() + "\n" +
                 doctor.getAddress() + "\n\n" +
-                "RE:" + patient.getlName().toUpperCase() + ", " + patient.getfName() + "\t\tDOB: " + patient.getDob() +
-                "\nMSP: " + patient.getMSP()
+                "RE:" + patient.getlName().toUpperCase() + ", " + patient.getfName() + "     DOB: " + patient.getDob() + "     Age: " + patient.getAge() + "    Gender: " + patient.getGender() +
+                "\nMSP: " + patient.getMSP() +
+                "\nDate of Examination: " + patient.getDoe()
         ).setFont(calibri).setFontColor(Color.BLACK);
         Paragraph info = new Paragraph().add(name);
         info.setTextAlignment(TextAlignment.LEFT);
@@ -234,18 +236,18 @@ public class ExportManager implements Printable {
 
         t.startNewRow();
         t.addCell("VA uncorrected");
-        t.addCell(patient.od.getVaUncorrected() + "/20");
-        t.addCell(patient.os.getVaUncorrected() + "/20");
+        t.addCell("20/" + (int) patient.od.getVaUncorrected() );
+        t.addCell("20/" + (int) patient.os.getVaUncorrected());
 
         t.startNewRow();
         t.addCell("VA Corrected");
-        t.addCell(patient.od.getVaCorrected() + "/20");
-        t.addCell(patient.os.getVaCorrected() + "/20");
+        t.addCell("20/" + (int) patient.od.getVaCorrected());
+        t.addCell("20/" + (int) patient.os.getVaCorrected());
 
         t.startNewRow();
         t.addCell("IOP:");
-        t.addCell(patient.od.getIOP() + "mmHg");
-        t.addCell(patient.os.getIOP() + "mmHg");
+        t.addCell(patient.od.getIOP() + " mmHg");
+        t.addCell(patient.os.getIOP() + " mmHg");
 
         t.startNewRow();
         t.addCell("@Time");
@@ -253,19 +255,13 @@ public class ExportManager implements Printable {
 
         t.startNewRow();
         t.addCell("Rx");
-        t.addCell("Sph x Cyl x Axis");
-        t.addCell("Sph x Cyl x Axis");
+        t.addCell("Sph x Cyl x Axis    Add");
+        t.addCell("Sph x Cyl x Axis    Add");
 
         t.startNewRow();
         t.addCell("");
-        t.addCell(patient.od.getSphere() + " x " + patient.od.getCyl() + " x " + patient.od.getAxis());
-        t.addCell(patient.os.getSphere() + " x " + patient.os.getCyl() + " x " + patient.os.getAxis());
-
-        t.startNewRow();
-        t.addCell("");
-        t.addCell("Add:" + patient.od.getAdd());
-        t.addCell("Add:" + patient.os.getAdd());
-
+        t.addCell(patient.od.getSphere() + " x " + patient.od.getCyl() + " x " + patient.od.getAxis() + "    " + patient.od.opAdd());
+        t.addCell(patient.os.getSphere() + " x " + patient.os.getCyl() + " x " + patient.os.getAxis() + "    " +  patient.os.opAdd());
 
         canvas.add(info);
         canvas.add(t);
@@ -281,7 +277,7 @@ public class ExportManager implements Printable {
 
         email.addRecipient(doctor.toString(), doctor.getEmail(), Message.RecipientType.TO);
         email.setFromAddress("Uptown Villiage Optometry", "mountdougtalks@gmail.com");
-        email.setSubject("Refferal for ");
+        email.setSubject("Refferal for " + patient.getfName() + " " + patient.getlName());
         email.setText("Please see attached referral letter.\nMary Jean Krawciw\nUptown Villiage Optometry");
 
         try {
@@ -289,7 +285,7 @@ public class ExportManager implements Printable {
             email.addAttachment("invitation", fd);
 
             //new Mailer("smtp.gmail.com", 25, "javamailno", "thisisasilly", TransportStrategy.SMTP_TLS).sendMail(email);
-            new Mailer("smtp.gmail.com", 587, "mountdougtalks", "mdtalks123", TransportStrategy.SMTP_TLS).sendMail(email);
+            new Mailer("sm.com", 587, "uptown@villageoptometry", "mdtalks123", TransportStrategy.SMTP_TLS).sendMail(email);
             //new Mailer("smtp.gmail.com", 465, "javamailno@gmail.com", "thisisasilly", TransportStrategy.SMTP_SSL).sendMail(email);
         } catch (Exception e){
             JOptionPane.showMessageDialog(null, e.getMessage());

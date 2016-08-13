@@ -82,4 +82,8 @@ public class Person implements Serializable{
     public boolean equals(Object o){
         return o.toString().equals(this.toString());
     }
+
+    public String forSaving(){
+        return lName + "_" + fName;
+    }
 }
